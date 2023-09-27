@@ -18,30 +18,13 @@ public class ControleAlgoritmoTeste implements Initializable{
   public void initialize(URL location, ResourceBundle resources) {
     //mensagemFlutuante(2, startMessageLabel, "APARECER");
 
-    mensagemFlutuante(2, startMessageLabel, "DESAPARECER");
+    mensagemFlutuante(2, startMessageLabel);
   }
 
-  public void mensagemFlutuante(int segundos, Label objetoDaMensagem, String caso){
+  public void mensagemFlutuante(int segundos, Label objetoDaMensagem){
     FadeTransition fadeTransition = new FadeTransition(Duration.seconds(segundos), objetoDaMensagem);
-    switch(caso){
-      case "APARECER": {
-        fadeTransition.setFromValue(0);
-        fadeTransition.setToValue(100);
-        fadeTransition.playFromStart();
-        break;
-      }
-      case "DESAPARECER": {
-        System.out.println("Entrou aqui");
-        fadeTransition.setFromValue(100);
-        fadeTransition.setToValue(0);
-        fadeTransition.play();
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-    
+    fadeTransition.setFromValue(100);
+    fadeTransition.setToValue(0);
+    fadeTransition.play();
   }
-
 }

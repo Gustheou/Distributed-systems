@@ -26,6 +26,20 @@
             <Image url="@../Images/Cursor.png" />
          </image>
       </ImageView>
-      <Label layoutX="469.0" layoutY="207.0" text="Algoritmo de teste tem como objetivo efetuar o teste da opção de teste." />
+      <Label fx:id="algorithmDescription" layoutX="469.0" layoutY="207.0" text="Algoritmo de teste tem como objetivo efetuar o teste da opção de teste." visible="false" />
+      <ImageView fx:id="startButtonImageView" fitHeight="33.0" fitWidth="132.0" layoutX="783.0" layoutY="527.0" onMouseClicked="#startButtonImageViewOnMouseClicked" onMouseEntered="#startButtonImageViewOnMouseEntered" onMouseExited="#startButtonImageViewOnMouseExited" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../Images/ButtonOnMouseOut.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <ImageView fx:id="auxStartImageView" fitHeight="33.0" fitWidth="24.0" layoutX="759.0" layoutY="533.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../Images/Cursor.png" />
+         </image>
+      </ImageView>
+      <AnchorPane fx:id="auxStartPane" layoutX="789.0" layoutY="551.0" prefHeight="1.0" prefWidth="63.0" style="-fx-background-color: #48453c;" visible="false" />
    </children>
 </AnchorPane>
