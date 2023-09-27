@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="684.0" prefWidth="1216.0" xmlns="http://javafx.com/javafx/8.0.202" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControleTela">
+   <children>
+      <ImageView fitHeight="691.0" fitWidth="1216.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Images/BG.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="firstAlgorithmImageView" fitHeight="150.0" fitWidth="200.0" layoutX="92.0" layoutY="206.0" onMouseClicked="#firstAlgorithmImageViewOnMouseClicked" onMouseEntered="#firstAlgorithmImageViewOnMouseEntered" onMouseExited="#firstAlgorithmImageViewOnMouseExited" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../Images/AlgoritmoTesteSD.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <ImageView fx:id="cursorImageView" fitHeight="33.0" fitWidth="24.0" layoutX="44.0" layoutY="212.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../Images/Cursor.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="469.0" layoutY="207.0" text="Algoritmo de teste tem como objetivo efetuar o teste da opção de teste." />
+   </children>
+</AnchorPane>
