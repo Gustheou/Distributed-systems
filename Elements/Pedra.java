@@ -25,9 +25,9 @@ public class Pedra {
     }
 
     public void diminuirVida(int dano){
-        if(dano>0 || dano<=id){
+        if((dano>0 || dano<=id) && this.vida>0){
             this.vida=vida-dano;
-        }else{
+        }else if(this.vida>0){
             this.vida=vida-1; 
         }
         
