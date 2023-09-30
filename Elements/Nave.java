@@ -107,7 +107,7 @@ public class Nave extends Thread {
     @Override
     public void run() {
         // Inicialize elementos do JavaFX, como imagens das naves
-        Image naveImage = new Image("caminho/para/imagem/nave.png");
+        Image naveImage = new Image("nave.png");
         ImageView naveImageView = new ImageView(naveImage);
 
         // Adicione naveImageView ao seu aplicativo JavaFX, defina sua posição usando this.x e this.y
