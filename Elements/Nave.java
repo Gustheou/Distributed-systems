@@ -1,6 +1,6 @@
 package Elements;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import java.io.*;
+import java.net.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,23 +10,41 @@ public class Nave extends Thread {
     private double velocidade;
     private double vida;
     private List<Tiro> tiros;
+    private int porta;
     private int cooldownTiro;
     private int cooldownAtual;
     private boolean isLeader;
     private int id;
     private SistemaDistribuido sistemaDistribuido;
+    private LiderancaSemaphore liderancaSemaphore = LiderancaSemaphore.getInstance();
+    private ProcessoEleitoral processoEleitoral = ProcessoEleitoral.getInstance();
+    private int liderAtual;
+    private boolean aguardandoRespostas;
+    private Pedra alvoAtual;
+    private ServerSocket serverSocket; 
+    
 
     public Nave(double x, double y,int id, SistemaDistribuido sistemaDistribuido) {
         this.x = x;
         this.y = y;
         this.velocidade = 5;
+        this.liderAtual=-1;
         this.vida = 100;
         this.tiros = new ArrayList<>();
         this.isLeader = false;
         this.cooldownTiro = 30;
         this.cooldownAtual = 0;
         this.id = id;
+        this.porta=id+1000;
         this.sistemaDistribuido = sistemaDistribuido;
+        this.alvoAtual=null;
+        try {
+            serverSocket = new ServerSocket(porta);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        
     }
 
     public void mover(String direcao) {
@@ -48,32 +66,99 @@ public class Nave extends Thread {
             this.cooldownAtual = this.cooldownTiro;
         }
     }
-    public void iniciarEleicao() {
+     // Adicione este método para ouvir mensagens de eleição
+     private void ouvirMensagens() {
+        try {
+            while (true) {
+                Socket socket = serverSocket.accept();
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+    
+                while (true) {
+                    try {
+                        Object mensagem = in.readObject();
+    
+                        if (mensagem instanceof MensagemEleicao) {
+                            // Trate a mensagem de eleição
+                            MensagemEleicao mensagemEleicao = (MensagemEleicao) mensagem;
+                            responderEleicao(mensagemEleicao);
+                        } else if (mensagem instanceof Integer) {
+                            // Trate o ID do alvo a ser atacado
+                            int idAlvo = (Integer) mensagem;
+                            // Leia o alvo atual do banco de dados compartilhado
+                            Pedra alvo = AlvoCompartilhado.getInstance().getAlvoAtual();
+                            if (alvo != null) {
+                                atacar(alvo);
+                            }
+                        }
+                    } catch (EOFException e) {
+                        // Fim da transmissão, saia do loop interno
+                        break;
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+    
+                in.close();
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+    public void iniciarEleicao() throws InterruptedException {
         // A nave inicia um processo de eleição
-        isLeader = true; // Inicialmente, a nave se propõe como líder
-        System.out.println("Pedra de Numero "+ id +" é a atual lider");
-
-        Nave[] outrasNaves = sistemaDistribuido.getNaves();
-
-        for (Nave outraNave : outrasNaves) {
-            if (outraNave.getId() != id) {
-                // Envie uma mensagem de eleição para todas as outras naves
-                boolean aceitaLideranca = outraNave.responderEleicao(id);
-                if (aceitaLideranca && outraNave.getId() > id) {
-                    // Outra nave aceitou liderança e tem um ID maior, desista da liderança
-                    isLeader = false;
+        Thread ouvirThread = new Thread(this::ouvirMensagens);
+        ouvirThread.start();
+        synchronized (processoEleitoral){
+            //liderancaSemaphore.adquirir();
+            isLeader = processoEleitoral.getIsLeader();
+            liderAtual = processoEleitoral.getLiderAtual();
+            aguardandoRespostas = true;
+            //liderancaSemaphore.liberar();
+            MensagemEleicao mensagemEleicao = new MensagemEleicao(id);
+            
+            List<Nave> outrasNavesList = sistemaDistribuido.getNavesList();
+            
+            for (Nave outraNave : outrasNavesList) {
+                if (outraNave.getId() != id) {
+                    // Envie uma mensagem de eleição para todas as outras naves
+                    enviarMensagemEleicao(outraNave, mensagemEleicao);
                 }
             }
-        }
 
-        // A nave espera por um período para receber respostas das outras naves
+            // Aguarde respostas das outras naves por um período de tempo
+            try {
+                Thread.sleep(5000); // Aguarda 5 segundos para respostas
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (processoEleitoral.getLiderAtual() == id) {
+                processoEleitoral.setIsLeader(true);
+                System.out.println("Nave " + id + " é o líder!");
+                Pedra alvo = sistemaDistribuido.escolherAlvo();
+                for (Nave outraNave : outrasNavesList) {
+                if (outraNave.getId() != id) {
+                    // Envie uma mensagem de eleição para todas as outras naves
+                   // Leia o alvo atual do banco de dados compartilhado
+                    
+                    
+                    enviarComandoDeAtaque(alvo);
+                    
+                
+                }
+            }
+                // A nave se torna o líder e ataca a pedra
+            } else {
+                System.out.println("Nave " + id + " não é o líder.");
+            }
 
-        // Verifique se nenhuma outra nave expressou intenção de ser líder
-        if (isLeader) {
-            // A nave se torna o líder e ataca a pedra
-            Pedra alvo = sistemaDistribuido.escolherAlvo();
-            atacar(alvo);
+            aguardandoRespostas = false;
+
         }
+        
     }
 
     public boolean responderEleicao(int proponenteId) {
@@ -82,10 +167,12 @@ public class Nave extends Thread {
     }
 
     public void atacar(Pedra alvo){
-        if(alvo.getVida()>=1){
+        if(alvo.getId()>=1){
             System.out.println("Nave " + id + " is attacking Pedra " + alvo.getId()+" Nivel de vida: "+alvo.getVida());
+            alvo.diminuirVida(5);
         }else{
             System.out.println("Todos os alvos foram eliminados");
+            
         }
             
     }
@@ -103,27 +190,77 @@ public class Nave extends Thread {
             this.cooldownAtual--;
         }
     }
+    public void responderEleicao(MensagemEleicao mensagem) {
+        // Uma nave recebe uma mensagem de eleição e decide se aceita a liderança do proponente
+        if (mensagem.getIdOrigem() > id) {
+            processoEleitoral.setLiderAtual(mensagem.getIdOrigem());
+            liderAtual = mensagem.getIdOrigem();
+        }
+    }
+    public String getHostName(){
+        return"127.0.0.1";
+    }
+    public int getPorta(){
+        return this.porta;
+    }
+
+    private void enviarMensagemEleicao(Nave destinatario, MensagemEleicao mensagem) {
+        try {
+            Socket socket = new Socket(destinatario.getHostName(), destinatario.getPorta());
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.writeObject(mensagem);
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void enviarComandoDeAtaque(Pedra alvo) {
+        try {
+            Nave[] outrasNaves = sistemaDistribuido.getNaves();
+    
+            for (Nave outraNave : outrasNaves) {
+                if (outraNave.getId() != id) {
+                    // Crie um soquete para se comunicar com a nave de destino
+                    Socket socket = new Socket("localhost", outraNave.getPorta());
+    
+                    // Envie o comando de ataque
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                    if (alvo != null) {
+                        int idDoAlvo = alvo.getId();
+                        out.writeObject(idDoAlvo);
+                        out.flush();
+                    }
+    
+                    // Feche o soquete
+                    socket.close();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     @Override
     public void run() {
-        // Inicialize elementos do JavaFX, como imagens das naves
-        Image naveImage = new Image("nave.png");
-        ImageView naveImageView = new ImageView(naveImage);
-
-        // Adicione naveImageView ao seu aplicativo JavaFX, defina sua posição usando this.x e this.y
-
         while (true) {
-            // Lógica principal da nave (movimento, tiro, atualização)
-            // Chame os métodos apropriados para realizar a lógica do jogo
-            if (sistemaDistribuido.getNaves().length>=1) {
-                iniciarEleicao();
-            }
-    
+            try{
+                //Thread.sleep(5000);
+                 if (sistemaDistribuido.getNaves().length>=1) {
+                    
+                    iniciarEleicao();
+                    
+                }
+            }catch(InterruptedException e){e.printStackTrace();}
             // Se a nave foi eleita líder, execute a ação de ataque
             if (isLeader) {
                 this.mover("direita");
                 this.atirar();
                 this.atualizar();
+               
+                
             }
 
             // Atualize a posição de naveImageView com this.x e this.y

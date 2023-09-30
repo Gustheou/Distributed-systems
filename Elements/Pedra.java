@@ -1,8 +1,9 @@
 package Elements;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class Pedra {
+public class Pedra implements Serializable{
     private int id;
     private int vida;
 
@@ -25,9 +26,9 @@ public class Pedra {
     }
 
     public void diminuirVida(int dano){
-        if((dano>0 || dano<=id) && this.vida>0){
+        if(dano>0 || dano<=id){
             this.vida=vida-dano;
-        }else if(this.vida>0){
+        }else{
             this.vida=vida-1; 
         }
         

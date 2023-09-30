@@ -1,5 +1,6 @@
 package Elements;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Random;
@@ -31,9 +32,9 @@ public class SistemaDistribuido {
                 // Notificar todas as naves sobre o alvo escolhido
                 if(alvo != null){
                     for (Nave nave : naves) {
-                        nave.atacar(alvo);
+                        //nave.atacar(alvo);
                     }
-                    alvo.diminuirVida(100);
+                    //alvo.diminuirVida(100);
                 }else{
                     System.out.println("Alvo não encontrado");
                 
@@ -56,6 +57,8 @@ public class SistemaDistribuido {
             int x = random.nextInt(800); // Gere coordenadas X aleatórias 
             int y = random.nextInt(600); // Gere coordenadas Y aleatórias 
             Nave nave = new Nave(id, x, y, this);
+            nave.start();
+            System.out.println("Nave de ID: " +nave.getId()+" foi iniciada na porta: "+nave.getPorta());
             registrarNave(nave);
         }
     }
@@ -73,56 +76,55 @@ public class SistemaDistribuido {
     }
     
 
-    // private Pedra ultimoAlvo = null;
-
-    // public Pedra escolherAlvo() {
-    //     // Verifique se há pedras na lista
-    //     if (pedras.isEmpty()) {
-    //         return null; // Não há pedras disponíveis
-    //     }
-
-    //     // Crie um objeto Random para escolher aleatoriamente uma pedra
-    //     Random random = new Random();
-
-    //     // Escolha aleatoriamente uma pedra que não seja a mesma que na rodada anterior
-    //     Pedra alvo = null;
-    //     do {
-    //         int indiceAleatorio = random.nextInt(pedras.size());
-    //         alvo = pedras.get(indiceAleatorio);
-    //     } while (alvo == ultimoAlvo);
-
-    //     // Mantenha o registro do último alvo escolhido
-    //     ultimoAlvo = alvo;
-
-    //     return alvo;
-    // }
+    
     private int ultimoIndiceAlvo = -1;
 
-public Pedra escolherAlvo() {
-    // Verifique se há pedras na lista
-    if (pedras.isEmpty()) {
-        return null; // Não há pedras disponíveis
-    }
-
-    // Encontre a pedra com a maior vida na lista
-    int indiceAleatorio;
-    do {
-        ultimoIndiceAlvo = (ultimoIndiceAlvo + 1) % pedras.size();
-        indiceAleatorio = ultimoIndiceAlvo;
-        Pedra alvo = pedras.get(indiceAleatorio);
-
-        // Verifique se a pedra já foi destruída, se sim, continue procurando
-        if (alvo.getVida() <= 0) {
-            continue;
+    public Pedra escolherAlvo() {
+        // Verifique se há pedras na lista
+        if (pedras.isEmpty()) {
+            return null; // Não há pedras disponíveis
         }
 
-        // Encontrou uma pedra válida, escolha-a como alvo
-        return alvo;
-    } while (indiceAleatorio != ultimoIndiceAlvo);
+        // Encontre a pedra com a maior vida na lista
+        int indiceAleatorio;
+        do {
+            ultimoIndiceAlvo = (ultimoIndiceAlvo + 1) % pedras.size();
+            indiceAleatorio = ultimoIndiceAlvo;
+            Pedra alvo = pedras.get(indiceAleatorio);
 
-    // Se todas as pedras foram destruídas, retorne null
-    return null;
-}
+            // Verifique se a pedra já foi destruída, se sim, continue procurando
+            if (alvo.getVida() <= 0) {
+                continue;
+            }
+
+            // Encontrou uma pedra válida, escolha-a como alvo
+            // Escolha um novo alvo
+                
+
+            // Defina o novo alvo no banco de dados compartilhado
+            AlvoCompartilhado.getInstance().setAlvoAtual(alvo);
+
+            return alvo;
+        } while (indiceAleatorio != ultimoIndiceAlvo);
+
+        // Se todas as pedras foram destruídas, retorne null
+        return null;
+    }
+    
+        // ...
+    
+        public Pedra encontrarAlvoPorID(int idAlvo) {
+            for (Pedra pedra : pedras) {
+                if (pedra.getId() == idAlvo) {
+                    return pedra;
+                }
+            }
+            return null; // Retorna null se nenhum alvo com o ID especificado for encontrado
+        }
+    
+        // ...
+    
+    
 
 
     
@@ -131,8 +133,8 @@ public Pedra escolherAlvo() {
     public static void main(String[] args) {
         SistemaDistribuido sistema = new SistemaDistribuido();
 
-        sistema.criarNavesAutomaticamente(6);
-        sistema.criarPedrasAutomaticamente(6);
+        sistema.criarNavesAutomaticamente(3);
+        sistema.criarPedrasAutomaticamente(3);
 
         // Iniciar o jogo
         sistema.iniciarJogo();
@@ -140,6 +142,9 @@ public Pedra escolherAlvo() {
 
     public Nave[] getNaves() {
         return naves.toArray(new Nave[0]);
+    }
+    public List<Nave> getNavesList(){
+        return this.naves;
     }
     
 }

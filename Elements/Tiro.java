@@ -15,12 +15,12 @@ public class Tiro {
         this.velocidade = 8;
 
         // Inicialize a imagem do tiro (certifique-se de ter a imagem adequada)
-        Image tiroImage = new Image("caminho/para/imagem/tiro.png");
-        this.imageView = new ImageView(tiroImage);
+        //Image tiroImage = new Image("/View/Images/Cursor.png");
+        //this.imageView = new ImageView(tiroImage);
 
         // Defina a posição inicial da imagem do tiro com base em this.x e this.y
-        this.imageView.setX(this.x);
-        this.imageView.setY(this.y);
+        //this.imageView.setX(this.x);
+        //this.imageView.setY(this.y);
 
         // Adicione a imageView do tiro ao seu aplicativo JavaFX
         // Exemplo: rootPane.getChildren().add(this.imageView);
@@ -31,7 +31,7 @@ public class Tiro {
         this.y -= this.velocidade;
 
         // Atualize a posição da imageView do tiro para refletir a nova posição
-        this.imageView.setY(this.y);
+        //this.imageView.setY(this.y);
     }
 
     // Getter para a imageView do tiro
