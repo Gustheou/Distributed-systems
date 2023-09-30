@@ -8,12 +8,11 @@ public class Pedra {
 
     public Pedra(int id) {
         this.id = id;
-        // Gere um valor aleatório de vida entre 1 e 100 (ou qualquer outro intervalo desejado)
+        // Gere um valor aleatório de vida entre 1 e 100 
         this.vida = gerarVidaAleatoria();
     }
     public Pedra(int id, int vida) {
         this.id = id;
-        // Gere um valor aleatório de vida entre 1 e 100 (ou qualquer outro intervalo desejado)
         this.vida = vida;
     }
 
