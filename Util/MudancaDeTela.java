@@ -13,7 +13,6 @@ public class MudancaDeTela {
   private static Stage stage;
   private static Scene telaMenu;
 
-
 /* ***************************************************************
 * Metodo: init
 * Funcao: Iniciar a exibição de telas

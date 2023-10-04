@@ -16,8 +16,8 @@ public class ControleTela {
 
   private boolean lockAlgorithm = false;
 
-  private final Image algorithmSelected = new Image("/View/Images/AlgoritmoTesteSelectedSD.png");
-  private final Image algorithmUnselected = new Image("/View/Images/AlgoritmoTesteSD.png");
+  private final Image algorithmSelected = new Image("/View/Images/AlgoritmoConsensoSelectedSD.png");
+  private final Image algorithmUnselected = new Image("/View/Images/AlgoritmoDeConsenso.png");
 
   @FXML
   private ImageView firstAlgorithmImageView, startButtonImageView, cursorImageView, auxStartImageView;
@@ -28,6 +28,8 @@ public class ControleTela {
   @FXML
   private AnchorPane auxStartPane;
 
+  public static Stage algoritmoRodando;
+
   @FXML
   private void firstAlgorithmImageViewOnMouseClicked(MouseEvent event) {
     cursorImageView.setVisible(true);
@@ -36,7 +38,6 @@ public class ControleTela {
     auxStartImageView.setVisible(true);
     startButtonImageView.setVisible(true);
     algorithmDescription.setVisible(true);
-
   }
 
   @FXML
@@ -56,8 +57,12 @@ public class ControleTela {
   @FXML
   private void startButtonImageViewOnMouseClicked(MouseEvent event) {
     resetChoices();
+    newScene();
+  }
+
+  private void newScene(){
     try {
-      Stage algoritmoRodando = new Stage();
+      algoritmoRodando = new Stage();
       Scene algoritmoCena = new Scene(FXMLLoader.load(getClass().getResource("/View/Fxml/ExecucaoAlgoritmo.fxml")));
       algoritmoRodando.setResizable(false);
       algoritmoRodando.setScene(algoritmoCena);
