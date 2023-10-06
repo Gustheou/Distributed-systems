@@ -4,11 +4,13 @@ public class ProcessoEleitoral {
     private static ProcessoEleitoral instancia = new ProcessoEleitoral();
     private boolean isLeader;
     private int liderAtual;
+    private int numeroDeRespostasPossitivas;
 
     private ProcessoEleitoral() {
         // Construtor privado para evitar instâncias múltiplas
         this.isLeader=false;
         this.liderAtual=-1;
+        this.numeroDeRespostasPossitivas=0;
     }
 
     public static ProcessoEleitoral getInstance() {
@@ -21,6 +23,12 @@ public class ProcessoEleitoral {
     }
     public void setIsLeader(boolean isLeader){
         this.isLeader=isLeader;
+    }
+    public void setRespostasPositiva(){
+        this.numeroDeRespostasPossitivas++;
+    }
+    public int getNumeroDeRespotasPositivas(){
+        return this.numeroDeRespostasPossitivas;
     }
     public int getLiderAtual(){
         return this.liderAtual;

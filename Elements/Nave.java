@@ -5,6 +5,7 @@ import java.net.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,6 +26,7 @@ public class Nave extends Thread {
   private boolean aguardandoRespostas;
   private Pedra alvoAtual;
   private ServerSocket serverSocket;
+  private AlvoCompartilhado alvoCompartilhado;
 
   public Nave(int id, SistemaDistribuido sistemaDistribuido) {
     this.liderAtual = -1;
@@ -33,9 +35,10 @@ public class Nave extends Thread {
     this.cooldownTiro = 30;
     this.cooldownAtual = 0;
     this.id = id;
-    this.porta = id + 1000;
+    this.porta = id +49152;
     this.sistemaDistribuido = sistemaDistribuido;
     this.alvoAtual = null;
+    this.alvoCompartilhado=AlvoCompartilhado.getInstance();
     try {
       serverSocket = new ServerSocket(porta);
     } catch (IOException e) {
@@ -75,9 +78,11 @@ public class Nave extends Thread {
               // Trate o ID do alvo a ser atacado
               int idAlvo = (Integer) mensagem;
               // Leia o alvo atual do banco de dados compartilhado
-              Pedra alvo = AlvoCompartilhado.getInstance().getAlvoAtual();
+              Pedra alvo = alvoCompartilhado.getAlvoAtual();
               if (alvo != null) {
                 atacar(alvo);
+              }else{
+                System.out.println("Alvo em questão esta nulo");
               }
             }
           } catch (EOFException e) {
@@ -98,6 +103,7 @@ public class Nave extends Thread {
 
   public void iniciarEleicao() throws InterruptedException {
     // A nave inicia um processo de eleição
+    Pedra alvo = sistemaDistribuido.escolherAlvo();
     Thread ouvirThread = new Thread(this::ouvirMensagens);
     ouvirThread.start();
     synchronized (processoEleitoral) {
@@ -109,7 +115,7 @@ public class Nave extends Thread {
       MensagemEleicao mensagemEleicao = new MensagemEleicao(id);
 
       List<Nave> outrasNavesList = sistemaDistribuido.getNavesList();
-
+      
       for (Nave outraNave : outrasNavesList) {
         if (outraNave.getId() != id) {
           // Envie uma mensagem de eleição para todas as outras naves
@@ -123,24 +129,24 @@ public class Nave extends Thread {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      if (processoEleitoral.getLiderAtual() == id) {
+      int maioria = (outrasNavesList.size()/2)+1;
+      if(processoEleitoral.getNumeroDeRespotasPositivas()>=maioria){
         processoEleitoral.setIsLeader(true);
         System.out.println("Nave " + id + " é o líder!");
-        Pedra alvo = sistemaDistribuido.escolherAlvo();
+        alvoCompartilhado.setAlvoAtual(alvo);
+        
         for (Nave outraNave : outrasNavesList) {
           if (outraNave.getId() != id) {
             // Envie uma mensagem de eleição para todas as outras naves
             // Leia o alvo atual do banco de dados compartilhado
 
-            enviarComandoDeAtaque(alvo);
-
+            enviarComandoDeAtaque(alvoCompartilhado.getAlvoAtual());
           }
         }
-        // A nave se torna o líder e ataca a pedra
-      } else {
+
+      }else{
         System.out.println("Nave " + id + " não é o líder.");
       }
-
       aguardandoRespostas = false;
 
     }
@@ -149,41 +155,38 @@ public class Nave extends Thread {
   public boolean responderEleicao(int proponenteId) {
     // Uma nave recebe uma mensagem de eleição e decide se aceita a liderança do
     // proponente
-    return id > proponenteId;
+    Random randTom = new Random();
+
+    return randTom.nextInt(2)==1 ? true:false;
   }
 
   //UM TIRO SO
   public void atacar(Pedra alvo) {
-    if (alvo.getId() >= 1) {
+    if (alvo.getVida() >= 1) {
       System.out.println("Nave " + id + " is attacking Pedra " + alvo.getId() + " Nivel de vida: " + alvo.getVida());
-      alvo.diminuirVida(5);
+      alvo.diminuirVida(1);
     } else {
-      System.out.println("Todos os alvos foram eliminados");
+      System.out.println("Pedra de ID "+alvo.getId()+" foi eliminada");
     }
   }
-  
-  //UM TIRO E MANIPULAR O MESMO NA CLASSE DE CONTROLE_TELA
-  /*
-  public void atualizar() {
-    // Atualiza a posição dos tiros e reduz o cooldown
-    for (Tiro tiro : this.tiros) {
-      tiro.atualizar();
-    }
-    if (this.cooldownAtual > 0) {
-      this.cooldownAtual--;
-    }
-  }
-  */
 
   //PROCESSO MAIS DEMOCRATICO 
   //RANDOMICO 0 E 1
   public void responderEleicao(MensagemEleicao mensagem) {
     // Uma nave recebe uma mensagem de eleição e decide se aceita a liderança do
     // proponente
-    if (mensagem.getIdOrigem() > id) {
+    Random random = new Random();
+    double limiteDeAceitacao = 0.5; //limite de aceitação (por exemplo, 0.5 para 50% de chance)
+    double chanceDeAceitacao = random.nextDouble(); //gera números entre 0 e 1 
+    if(chanceDeAceitacao > limiteDeAceitacao){
+      // A nave aceitou a liderança do propante 
       processoEleitoral.setLiderAtual(mensagem.getIdOrigem());
+      processoEleitoral.setRespostasPositiva();
       liderAtual = mensagem.getIdOrigem();
+    }else{
+      System.out.println("Canditado "+mensagem.getIdOrigem()+" teve sua proposta negada por nave de ID "+id);
     }
+   
   }
 
   public String getHostName() {

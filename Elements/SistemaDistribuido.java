@@ -101,7 +101,7 @@ public class SistemaDistribuido {
       // Escolha um novo alvo
 
       // Defina o novo alvo no banco de dados compartilhado
-      AlvoCompartilhado.getInstance().setAlvoAtual(alvo);
+      //AlvoCompartilhado.getInstance().setAlvoAtual(alvo);
 
       return alvo;
     } while (indiceAleatorio != ultimoIndiceAlvo);
