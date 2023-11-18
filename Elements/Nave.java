@@ -130,7 +130,7 @@ public class Nave extends Thread {
 
         alvoCompartilhado.setAlvoAtual(alvo);
         try{
-          System.out.println("Nave de ID"+ id +"escolheu pedra de ID "+ alvo.getId());
+          System.out.println("Nave de ID "+ id +" escolheu pedra de ID "+ alvo.getId());
         }catch(NullPointerException e){
           System.out.println("Nave nula ou não encontrada");
         }
