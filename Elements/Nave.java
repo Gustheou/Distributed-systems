@@ -10,6 +10,8 @@ import java.util.Random;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import Controller.ControleAlgoritmoConsenso;
+
 public class Nave extends Thread {
   private double x;
   private double y;
@@ -24,11 +26,13 @@ public class Nave extends Thread {
   private ProcessoEleitoral processoEleitoral = ProcessoEleitoral.getInstance();
   private int liderAtual;
   private boolean aguardandoRespostas;
-  private Pedra alvoAtual;
+  private Inimigo alvoAtual;
   private ServerSocket serverSocket;
   private AlvoCompartilhado alvoCompartilhado;
 
-  public Nave(int id, SistemaDistribuido sistemaDistribuido) {
+  private ControleAlgoritmoConsenso controleAlgoritmoConsenso;
+
+  public Nave(int id, SistemaDistribuido sistemaDistribuido, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
     this.liderAtual = -1;
     this.tiros = new ArrayList<>();
     this.isLeader = false;
@@ -39,23 +43,13 @@ public class Nave extends Thread {
     this.sistemaDistribuido = sistemaDistribuido;
     this.alvoAtual = null;
     this.alvoCompartilhado=AlvoCompartilhado.getInstance();
+    this.controleAlgoritmoConsenso = controleAlgoritmoConsenso;
     try {
       serverSocket = new ServerSocket(porta);
     } catch (IOException e) {
       e.printStackTrace();
     }
-    //fazer a animacao da nave surgindo do infinito ate o local de pouso
-  }
-
-  public void atirar() {
-    // Lógica para disparar tiros
-    if (this.cooldownAtual <= 0) {
-      // Crie um novo tiro na posição da nave
-      Tiro tiro = new Tiro(this.x, this.y);
-      this.tiros.add(tiro);
-      // Reduza o cooldown para evitar tiros contínuos
-      this.cooldownAtual = this.cooldownTiro;
-    }
+    controleAlgoritmoConsenso.novaNave();
   }
 
   // Adicione este método para ouvir mensagens de eleição
@@ -78,7 +72,7 @@ public class Nave extends Thread {
               // Trate o ID do alvo a ser atacado
               int idAlvo = (Integer) mensagem;
               // Leia o alvo atual do banco de dados compartilhado
-              Pedra alvo = alvoCompartilhado.getAlvoAtual();
+              Inimigo alvo = alvoCompartilhado.getAlvoAtual();
               if (alvo != null) {
                 atacar(alvo);
               }else{
@@ -103,7 +97,7 @@ public class Nave extends Thread {
 
   public void iniciarEleicao() throws InterruptedException {
     // A nave inicia um processo de eleição
-    Pedra alvo = sistemaDistribuido.escolherAlvo();
+    Inimigo alvo = sistemaDistribuido.escolherAlvo();
     Thread ouvirThread = new Thread(this::ouvirMensagens);
     ouvirThread.start();
     synchronized (processoEleitoral) {
@@ -143,7 +137,7 @@ public class Nave extends Thread {
             enviarComandoDeAtaque(alvoCompartilhado.getAlvoAtual());
           }
         }
-
+        processoEleitoral.zeraNumeroDeRespostasPositivas();
       }else{
         System.out.println("Nave " + id + " não é o líder.");
       }
@@ -161,7 +155,9 @@ public class Nave extends Thread {
   }
 
   //UM TIRO SO
-  public void atacar(Pedra alvo) {
+  public void atacar(Inimigo alvo) {
+    //rotacionar e atacar
+
     if (alvo.getVida() >= 1) {
       System.out.println("Nave " + id + " is attacking Pedra " + alvo.getId() + " Nivel de vida: " + alvo.getVida());
       alvo.diminuirVida(1);
@@ -209,7 +205,7 @@ public class Nave extends Thread {
     }
   }
 
-  public void enviarComandoDeAtaque(Pedra alvo) {
+  public void enviarComandoDeAtaque(Inimigo alvo) {
     try {
       Nave[] outrasNaves = sistemaDistribuido.getNaves();
 

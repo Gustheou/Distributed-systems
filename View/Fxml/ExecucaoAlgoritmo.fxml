@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="blackAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="607.0" prefWidth="910.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.202" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControleAlgoritmoTeste">
+<AnchorPane fx:id="blackAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="607.0" prefWidth="910.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.202" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ControleAlgoritmoConsenso">
    <children>
       <Label fx:id="startMessageLabel" layoutX="245.0" layoutY="274.0" text="Algoritmo de consenso" textFill="WHITE">
          <font>

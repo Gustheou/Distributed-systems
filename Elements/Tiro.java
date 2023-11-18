@@ -1,46 +1,66 @@
 package Elements;
 
 import javafx.animation.TranslateTransition;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 public class Tiro {
-  private double x;
-  private double y;
-  private final double VELOCIDADE_DO_TIRO = 1500;
+  @FXML
   private ImageView bulletImage;
-  private final String pathToBulletImage = "/View/Images/Bullet.png";
+  @FXML
+  private ImageView nave;
 
-  public Tiro(double x, double y) {
-    this.x = x;
-    this.y = y;
+  private final double VELOCIDADE_DO_TIRO = 5000;
+  private final String CAMINHO_PARA_IMAGEM_DO_TIRO = "/View/Images/Bullet.png";
+  private double origemDoTiroX, origemDoTiroY;
 
-    // Inicialize a imagem do tiro (certifique-se de ter a imagem adequada)
-    // Image tiroImage = new Image("/View/Images/Cursor.png");
-    // this.imageView = new ImageView(tiroImage);
-
-    // Defina a posição inicial da imagem do tiro com base em this.x e this.y
-    // this.imageView.setX(this.x);
-    // this.imageView.setY(this.y);
-
-    // Adicione a imageView do tiro ao seu aplicativo JavaFX
-    // Exemplo: rootPane.getChildren().add(this.imageView);
-    bulletImage = new ImageView(new Image(pathToBulletImage));
+  public Tiro(ImageView naveDeOrigem) {
+    this.nave = naveDeOrigem;
+    bulletImage = new ImageView(new Image(CAMINHO_PARA_IMAGEM_DO_TIRO));
+    bulletImage.setFitWidth(10);
+    bulletImage.setFitHeight(25);
   }
   
-  // Getter para a imageView do tiro
   public ImageView getBulletImage() {
     return this.bulletImage;
   }
 
-  public void tiroEmMovimento(int posicaoInicialEixoX, int posicaoInicialEixoY, int posicaoFinalEixoX, int posicaoFinalEixoY){
+  public void atirar(Label inimigoDeDestino){
+    double destinoX = inimigoDeDestino.getLayoutX();
+    double destinoY = inimigoDeDestino.getLayoutY();
+    rotacionarParaAtacar(inimigoDeDestino);
+    //Thread.sleep("1000");
+    double origemDoTiroX = nave.getLayoutX();
+    double origemDoTiroY = nave.getLayoutY()+(nave.getFitHeight()/2);
+    
+    tiroEmMovimento(origemDoTiroX, origemDoTiroY, destinoX, destinoY);
+  }
+
+  public void tiroEmMovimento(double posicaoInicialEixoX, double posicaoInicialEixoY, double posicaoFinalEixoX, double posicaoFinalEixoY){
     TranslateTransition animacaoDoTiro = new TranslateTransition(Duration.millis(VELOCIDADE_DO_TIRO), bulletImage);
-    animacaoDoTiro.setFromX(posicaoInicialEixoX);
-    animacaoDoTiro.setFromY(posicaoFinalEixoY);
-    //fazer o to (destino). Pegar informacao de onde esta a pedra
-    //animacaoDoTiro.setToX(posicaoFinalEixoX);
-    //animacaoDoTiro.setToY(posicaoFinalEixoY);
+    animacaoDoTiro.setFromX(origemDoTiroX);
+    animacaoDoTiro.setFromY(origemDoTiroY);
+    animacaoDoTiro.setToX(posicaoFinalEixoX);
+    animacaoDoTiro.setToY(posicaoFinalEixoY);
     animacaoDoTiro.play();
+  }
+
+  public void rotacionarParaAtacar(Label alvo) {
+    double posicaoXDaNave = origemDoTiroX;
+    double posicaoYDaNave = origemDoTiroY;
+    double posicaoXDoAlvo = alvo.getLayoutX();
+    double posicaoYDoAlvo = alvo.getLayoutY();
+    System.out.println(nave.getRotate());
+    nave.setRotate(calcularAngulacaoDoSeno(posicaoXDaNave, posicaoYDaNave, posicaoXDoAlvo, posicaoYDoAlvo));
+  }
+
+  private double calcularAngulacaoDoSeno(double posicaoXDaNave, double posicaoYDaNave, double posicaoXDoAlvo, double posicaoYDoAlvo){
+    double catetoAdjacente = Math.abs(posicaoXDaNave - posicaoXDoAlvo);
+    double catetoOposto = Math.abs(posicaoYDaNave - posicaoYDoAlvo);
+    double hipotenusa = Math.sqrt((catetoAdjacente*catetoAdjacente)+(catetoOposto*catetoOposto));
+    return catetoAdjacente/hipotenusa;
   }
 }

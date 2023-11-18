@@ -3,18 +3,23 @@ package Elements;
 import java.io.Serializable;
 import java.util.Random;
 
-public class Pedra implements Serializable{
+import Controller.ControleAlgoritmoConsenso;
+
+public class Inimigo implements Serializable{
     private int id;
     private int vida;
+    private ControleAlgoritmoConsenso controleAlgoritmoConsenso;
 
-    public Pedra(int id) {
+    public Inimigo(int id) {
         this.id = id;
         // Gere um valor aleatório de vida entre 1 e 100 
         this.vida = gerarVidaAleatoria();
     }
-    public Pedra(int id, int vida) {
+    public Inimigo(int id, int vida, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
         this.id = id;
         this.vida = vida;
+        this.controleAlgoritmoConsenso = controleAlgoritmoConsenso;
+        controleAlgoritmoConsenso.novoInimigo();
     }
 
     public int getId() {

@@ -30,6 +30,9 @@ public class ProcessoEleitoral {
     public int getNumeroDeRespotasPositivas(){
         return this.numeroDeRespostasPossitivas;
     }
+    public void zeraNumeroDeRespostasPositivas(){
+        this.numeroDeRespostasPossitivas=0;
+    }
     public int getLiderAtual(){
         return this.liderAtual;
     }

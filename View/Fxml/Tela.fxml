@@ -13,7 +13,7 @@
             <Image url="@../Images/BG.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="firstAlgorithmImageView" fitHeight="150.0" fitWidth="200.0" layoutX="92.0" layoutY="206.0" onMouseClicked="#firstAlgorithmImageViewOnMouseClicked" onMouseEntered="#firstAlgorithmImageViewOnMouseEntered" onMouseExited="#firstAlgorithmImageViewOnMouseExited" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="consensusAlgorithmImageView" fitHeight="150.0" fitWidth="200.0" layoutX="92.0" layoutY="206.0" onMouseClicked="#consensusAlgorithmImageViewOnMouseClicked" onMouseEntered="#consensusAlgorithmImageViewOnMouseEntered" onMouseExited="#consensusAlgorithmImageViewOnMouseExited" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../Images/AlgoritmoDeConsenso.png" />
          </image>

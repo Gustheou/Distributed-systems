@@ -10,7 +10,6 @@ import Controller.*;
 
 
 public class MudancaDeTela {
-  private static Stage stage;
   private static Scene telaMenu;
 
 /* ***************************************************************
@@ -21,7 +20,6 @@ public class MudancaDeTela {
 *************************************************************** */
   public static void init (Stage cenario) throws IOException {
     new ControleTela();
-    stage = cenario;
     Parent fxmlTelaInicial = FXMLLoader.load(MudancaDeTela.class.getResource("/View/Fxml/Tela.fxml"));
     telaMenu = new Scene (fxmlTelaInicial);
 
