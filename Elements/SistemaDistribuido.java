@@ -81,6 +81,7 @@ public class SistemaDistribuido {
   public Inimigo escolherAlvo() {
     // Verifique se há inimigos na lista
     if (inimigos.isEmpty()) {
+      System.out.println("Lista de Inimigos vazia, portanto retornado Null");
       return null; // Não há inimigos disponíveis
     }
 
@@ -106,6 +107,7 @@ public class SistemaDistribuido {
     } while (indiceAleatorio != ultimoIndiceAlvo);
 
     // Se todas as inimigos foram destruídas, retorne null
+    System.out.println("Todos os inimigos foram destruída, portanto retornado Null");
     return null;
   }
 

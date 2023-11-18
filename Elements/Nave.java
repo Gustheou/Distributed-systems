@@ -26,7 +26,7 @@ public class Nave extends Thread {
   private ProcessoEleitoral processoEleitoral = ProcessoEleitoral.getInstance();
   private int liderAtual;
   private boolean aguardandoRespostas;
-  private Inimigo alvoAtual;
+  private Inimigo alvoAtual,alvoEscolhido;
   private ServerSocket serverSocket;
   private AlvoCompartilhado alvoCompartilhado;
 
@@ -119,7 +119,7 @@ public class Nave extends Thread {
 
       // Aguarde respostas das outras naves por um período de tempo
       try {
-        Thread.sleep(5000); // Aguarda 5 segundos para respostas
+        Thread.sleep(2000); // Aguarda 5 segundos para respostas
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -127,7 +127,14 @@ public class Nave extends Thread {
       if(processoEleitoral.getNumeroDeRespotasPositivas()>=maioria){
         processoEleitoral.setIsLeader(true);
         System.out.println("Nave " + id + " é o líder!");
+
         alvoCompartilhado.setAlvoAtual(alvo);
+        try{
+          System.out.println("Nave de ID"+ id +"escolheu pedra de ID "+ alvo.getId());
+        }catch(NullPointerException e){
+          System.out.println("Nave nula ou não encontrada");
+        }
+        
         
         for (Nave outraNave : outrasNavesList) {
           if (outraNave.getId() != id) {
@@ -235,7 +242,6 @@ public class Nave extends Thread {
   public void run() {
     while (true) {
       try {
-        // Thread.sleep(5000);
         if (sistemaDistribuido.getNaves().length > 1) {
 
           iniciarEleicao();

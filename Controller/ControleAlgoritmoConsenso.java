@@ -79,8 +79,8 @@ public class ControleAlgoritmoConsenso implements Initializable{
         e.printStackTrace();
       }
       sistema = new SistemaDistribuido();
+      sistema.criarInimigosAutomaticamente(10, this);
       sistema.criarNavesAutomaticamente(5, this);
-      sistema.criarInimigosAutomaticamente(10, this); //8
       sistema.iniciarJogo();
     });
     return threadParaCriarNaves;
@@ -237,7 +237,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
         return "Weslei";
       }
       default: {
-        return "Null";
+        return "NullPointerException";
       }
     }
   }
