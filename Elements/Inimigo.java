@@ -13,13 +13,15 @@ public class Inimigo implements Serializable{
     public Inimigo(int id) {
         this.id = id;
         // Gere um valor aleatório de vida entre 1 e 100 
-        this.vida = gerarVidaAleatoria();
+        //this.vida = gerarVidaAleatoria();
+        this.vida = gerarVida();
     }
-    public Inimigo(int id, int vida, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
+    public Inimigo(int id, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
         this.id = id;
-        this.vida = vida;
+        //this.vida = vida;
         this.controleAlgoritmoConsenso = controleAlgoritmoConsenso;
         controleAlgoritmoConsenso.novoInimigo();
+        this.vida = 5;
     }
 
     public int getId() {
@@ -31,12 +33,14 @@ public class Inimigo implements Serializable{
     }
 
     public void diminuirVida(int dano){
+        /*
         if(dano>0 || dano<=id){
             this.vida=vida-dano;
         }else{
             this.vida=vida-1; 
         }
-        
+        */
+        this.vida = vida - 1;
     }
 
     private int gerarVidaAleatoria() {
@@ -44,5 +48,9 @@ public class Inimigo implements Serializable{
         
         int vidaAleatoria = random.nextInt(100) + 20;
         return vidaAleatoria;
+    }
+
+    private int gerarVida(){
+        return controleAlgoritmoConsenso.getNumeroDeNave();
     }
 }

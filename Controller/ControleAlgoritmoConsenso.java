@@ -37,6 +37,13 @@ public class ControleAlgoritmoConsenso implements Initializable{
   @FXML
   private ImageView ship;
 
+  @FXML
+  private Label respostaEleicao;
+
+  private List<Label> multipleAnswer = new ArrayList<Label>();
+
+  private List<ImageView> multipleShips = new ArrayList<ImageView>();
+
   private Thread threadParaCriarNaves;
 
   private SistemaDistribuido sistema;
@@ -45,6 +52,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
 
   private final int POSSIVEIS_INIMIGOS = 23;
   
+  private List<Integer> inimigosSelecionaods = new ArrayList<Integer>();
 
   private int[] posicoesDasNaves = {415, 251, 574, 89, 732};
   private boolean[] statusDeOcupacaoDasNaves = {false, false, false, false, false};
@@ -95,7 +103,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
     fadeTransition.play();
   }
 
-  public void novaNave(){
+  public void novaNave(int newID){
     int index = 0;
     for (int i = 0; i < statusDeOcupacaoDasNaves.length; i++){
       if (statusDeOcupacaoDasNaves[i] == false) {
@@ -108,6 +116,12 @@ public class ControleAlgoritmoConsenso implements Initializable{
     ship.setFitWidth(81);
     ship.setFitHeight(79);
     ship.setLayoutX(posicoesDasNaves[index]);
+    ship.setId("Nave"+newID);
+    System.out.println("ID nave: " + ship.getId());
+    multipleShips.add(ship);
+    Label info = new Label();
+    info.setId(ship.getId());
+    multipleAnswer.add(info);
     movimentacao(ship, 2, 621, 443);
     Platform.runLater(() -> {
       blackAnchorPane.getChildren().add(ship);
@@ -115,7 +129,14 @@ public class ControleAlgoritmoConsenso implements Initializable{
   }
 
   public void novoInimigo(){
-    Label enemy = new Label(inimigoAleatorio(new Random().nextInt(POSSIVEIS_INIMIGOS)));
+    int indiceInimigo = new Random().nextInt(POSSIVEIS_INIMIGOS);
+    if (inimigosSelecionaods.contains(indiceInimigo)){
+      while(inimigosSelecionaods.contains(indiceInimigo)){
+        indiceInimigo = new Random().nextInt(POSSIVEIS_INIMIGOS);
+      }
+    }
+    inimigosSelecionaods.add(indiceInimigo);
+    Label enemy = new Label(inimigoAleatorio(indiceInimigo));
     enemy.setFont(Font.loadFont(getClass().getResourceAsStream("/View/Fonts/FOT_Rodin_Pro_DB.otf"), (new Random().nextInt(20))+10));
     enemy.setLayoutX(new Random().nextInt(700));
     enemy.setTextFill(Color.WHITE);
@@ -240,5 +261,72 @@ public class ControleAlgoritmoConsenso implements Initializable{
         return "NullPointerException";
       }
     }
+  }
+
+  public void aFavorEleicao(int id){
+    ImageView ship = getNave("Nave"+id);
+    Label respostaEleicao = getInfoLabel(ship.getId());
+    respostaEleicao.setLayoutX(ship.getLayoutX());
+    //System.out.println("EIXO X:" + ship.getX() + " || " + respostaEleicao.getLayoutX() + " || " + ship.getLayoutX() + " || " + ship.getId());
+    respostaEleicao.setLayoutY(450);
+    Platform.runLater(() -> {
+      if (!blackAnchorPane.getChildren().contains(respostaEleicao)){
+        blackAnchorPane.getChildren().add(respostaEleicao);
+        respostaEleicao.setVisible(false);
+      }
+      respostaEleicao.setVisible(true);
+      respostaEleicao.setText("Sim");
+    });
+  }
+
+  public void contraEleicao(int id){
+    ImageView ship = getNave("Nave"+id);
+    Label respostaEleicao = getInfoLabel(ship.getId());
+    respostaEleicao.setLayoutX(ship.getLayoutX());
+    //System.out.println("EIXO X:" + ship.getX() + " || " + respostaEleicao.getLayoutX() + " || " + ship.getLayoutX() + " || " + ship.getId());
+    respostaEleicao.setLayoutY(450);
+    
+    Platform.runLater(() -> {
+      if (!blackAnchorPane.getChildren().contains(respostaEleicao)){
+        respostaEleicao.setVisible(false);
+        blackAnchorPane.getChildren().add(respostaEleicao);
+      }
+      respostaEleicao.setText("Não");
+      respostaEleicao.setVisible(true);
+    });
+  }
+
+  private ImageView getNave(String id){
+    ImageView naveEscolhida = new ImageView();
+    for(ImageView nave : multipleShips){
+      if (nave.getId().equals(id)){
+        naveEscolhida = nave;
+        break;
+      }
+    }
+    return naveEscolhida;
+  }
+
+  private Label getInfoLabel(String id){
+    Label labelEscolhido = new Label();
+    for(Label nave : multipleAnswer){
+      if (nave.getId().equals(id)){
+        labelEscolhido = nave;
+        break;
+      }
+    }
+    labelEscolhido.setFont(Font.loadFont(getClass().getResourceAsStream("/View/Fonts/FOT_Rodin_Pro_DB.otf"), 12));
+    labelEscolhido.setTextFill(Color.WHITE);
+    return labelEscolhido;
+  }
+  
+  public int getNumeroDeNave(){
+    int contador = 0;
+    for (int i = 0; i < statusDeOcupacaoDasNaves.length; i++){
+      if (statusDeOcupacaoDasNaves[i] == true) {
+        contador = contador + 1;
+      }
+    }
+    return contador;
   }
 }

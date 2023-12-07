@@ -65,12 +65,12 @@ public class SistemaDistribuido {
   }
 
   public void criarInimigosAutomaticamente(int quantidade, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
-    Random random;
+    //Random random;
     for (int i = 0; i < quantidade; i++) {
       int id = i + 1; // Gere IDs únicos para cada inimigo
-      random = new Random();
-      int vida = random.nextInt(100) + 1; // Gere valores de vida aleatórios de 1 a 100
-      Inimigo inimigo = new Inimigo(id, vida, controleAlgoritmoConsenso);
+      //random = new Random();
+      //int vida = random.nextInt(100) + 1; // Gere valores de vida aleatórios de 1 a 100
+      Inimigo inimigo = new Inimigo(id, controleAlgoritmoConsenso);
       System.out.println("inimigo de N " + inimigo.getId() + " e de vida " + inimigo.getVida() + " foi criada");
       registrarinimigo(inimigo);
     }
@@ -90,6 +90,7 @@ public class SistemaDistribuido {
     do {
       ultimoIndiceAlvo = (ultimoIndiceAlvo + 1) % inimigos.size();
       indiceAleatorio = ultimoIndiceAlvo;
+      System.out.println("INDICEEE: " + indiceAleatorio);
       Inimigo alvo = inimigos.get(indiceAleatorio);
 
       // Verifique se a inimigo já foi destruída, se sim, continue procurando

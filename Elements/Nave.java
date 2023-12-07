@@ -49,7 +49,7 @@ public class Nave extends Thread {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    controleAlgoritmoConsenso.novaNave();
+    controleAlgoritmoConsenso.novaNave(id);
   }
 
   // Adicione este método para ouvir mensagens de eleição
@@ -118,8 +118,9 @@ public class Nave extends Thread {
       }
 
       // Aguarde respostas das outras naves por um período de tempo
+      //AQUI EH O TEMPO DA ELEICAO
       try {
-        Thread.sleep(2000); // Aguarda 5 segundos para respostas
+        Thread.sleep(10000); // Aguarda 5 segundos para respostas
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -185,8 +186,14 @@ public class Nave extends Thread {
       // A nave aceitou a liderança do propante 
       processoEleitoral.setLiderAtual(mensagem.getIdOrigem());
       processoEleitoral.setRespostasPositiva();
+      //LABEL PARA APROVAR ELEICAO
+      controleAlgoritmoConsenso.aFavorEleicao(id);
+
       liderAtual = mensagem.getIdOrigem();
     }else{
+      //LABEL PARA NEGAR A ELEICAO
+      controleAlgoritmoConsenso.contraEleicao(id);
+      
       System.out.println("Canditado "+mensagem.getIdOrigem()+" teve sua proposta negada por nave de ID "+id);
     }
    
