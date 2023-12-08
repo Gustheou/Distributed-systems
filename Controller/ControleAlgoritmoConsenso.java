@@ -154,13 +154,17 @@ public class ControleAlgoritmoConsenso implements Initializable{
     return inimigosList.get(index);
   }
 
-  public void rotacionarParaAtacar(Label alvo) {
+  public void rotacionarParaAtacar(int id) {
+    Label alvo = inimigosList.get(id);
     double posicaoXDaNave = ship.getLayoutX();
     double posicaoYDaNave = ship.getLayoutY();
     double posicaoXDoAlvo = alvo.getLayoutX();
     double posicaoYDoAlvo = alvo.getLayoutY();
     System.out.println(ship.getRotate());
-    ship.setRotate(calcularAngulacaoDoSeno(posicaoXDaNave, posicaoYDaNave, posicaoXDoAlvo, posicaoYDoAlvo));
+    Platform.runLater(() -> {
+
+      ship.setRotate(calcularAngulacaoDoSeno(posicaoXDaNave, posicaoYDaNave, posicaoXDoAlvo, posicaoYDoAlvo));
+    });
   }
 
   private double calcularAngulacaoDoSeno(double posicaoXDaNave, double posicaoYDaNave, double posicaoXDoAlvo, double posicaoYDoAlvo){
@@ -328,5 +332,21 @@ public class ControleAlgoritmoConsenso implements Initializable{
       }
     }
     return contador;
+  }
+
+  public void setLeader(String id){
+    Label lider = getInfoLabel(id);
+    Platform.runLater(() -> {
+      lider.setText("Lider");
+
+    });
+  }
+
+  public void setMaybeLeader(String id){
+    Label lider = getInfoLabel(id);
+    Platform.runLater(() -> {
+      lider.setText("Lider?");
+
+    });
   }
 }

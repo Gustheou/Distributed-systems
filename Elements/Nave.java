@@ -3,22 +3,16 @@ package Elements;
 import java.io.*;
 import java.net.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import Controller.ControleAlgoritmoConsenso;
 
 public class Nave extends Thread {
   private double x;
   private double y;
-  private List<Tiro> tiros;
   private int porta;
-  private int cooldownTiro;
-  private int cooldownAtual;
   private boolean isLeader;
   private int id;
   private SistemaDistribuido sistemaDistribuido;
@@ -34,15 +28,13 @@ public class Nave extends Thread {
 
   public Nave(int id, SistemaDistribuido sistemaDistribuido, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
     this.liderAtual = -1;
-    this.tiros = new ArrayList<>();
     this.isLeader = false;
-    this.cooldownTiro = 30;
-    this.cooldownAtual = 0;
     this.id = id;
     this.porta = id +49152;
     this.sistemaDistribuido = sistemaDistribuido;
     this.alvoAtual = null;
     this.alvoCompartilhado=AlvoCompartilhado.getInstance();
+    this.alvoCompartilhado.setControleAlgoritmoConsenso(controleAlgoritmoConsenso);
     this.controleAlgoritmoConsenso = controleAlgoritmoConsenso;
     try {
       serverSocket = new ServerSocket(porta);
@@ -103,6 +95,7 @@ public class Nave extends Thread {
     synchronized (processoEleitoral) {
       // liderancaSemaphore.adquirir();
       isLeader = processoEleitoral.getIsLeader();
+      controleAlgoritmoConsenso.setMaybeLeader("Nave"+id);
       liderAtual = processoEleitoral.getLiderAtual();
       aguardandoRespostas = true;
       // liderancaSemaphore.liberar();
@@ -120,7 +113,7 @@ public class Nave extends Thread {
       // Aguarde respostas das outras naves por um período de tempo
       //AQUI EH O TEMPO DA ELEICAO
       try {
-        Thread.sleep(10000); // Aguarda 5 segundos para respostas
+        Thread.sleep(5000); // Aguarda 5 segundos para respostas
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -128,6 +121,10 @@ public class Nave extends Thread {
       if(processoEleitoral.getNumeroDeRespotasPositivas()>=maioria){
         processoEleitoral.setIsLeader(true);
         System.out.println("Nave " + id + " é o líder!");
+        //controleAlgoritmoConsenso;
+        String idNave = "Nave"+id;
+        controleAlgoritmoConsenso.setLeader(idNave);
+        System.out.println("nave id: " + idNave);
 
         alvoCompartilhado.setAlvoAtual(alvo);
         try{
