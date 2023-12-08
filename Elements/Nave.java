@@ -93,12 +93,11 @@ public class Nave extends Thread {
     Thread ouvirThread = new Thread(this::ouvirMensagens);
     ouvirThread.start();
     synchronized (processoEleitoral) {
-      // liderancaSemaphore.adquirir();
       isLeader = processoEleitoral.getIsLeader();
       controleAlgoritmoConsenso.setMaybeLeader("Nave"+id);
       liderAtual = processoEleitoral.getLiderAtual();
       aguardandoRespostas = true;
-      // liderancaSemaphore.liberar();
+      
       MensagemEleicao mensagemEleicao = new MensagemEleicao(id);
 
       List<Nave> outrasNavesList = sistemaDistribuido.getNavesList();
@@ -259,7 +258,7 @@ public class Nave extends Thread {
         //escolherAlvo(Random int);
       }
 
-      // Atualize a posição de naveImageView com this.x e this.y
+      
 
       try {
         Thread.sleep(16); // Aguarda um curto período (aproximadamente 60 quadros por segundo)
