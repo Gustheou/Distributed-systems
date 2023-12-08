@@ -1,6 +1,7 @@
-package Elements;
+package Util;
 
 import Controller.ControleAlgoritmoConsenso;
+import Model.Inimigo;
 
 public class AlvoCompartilhado {
   private static AlvoCompartilhado instancia = new AlvoCompartilhado();

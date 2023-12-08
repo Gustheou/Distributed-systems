@@ -1,4 +1,4 @@
-package Elements;
+package Util;
 
 public class ProcessoEleitoral {
     private static ProcessoEleitoral instancia = new ProcessoEleitoral();

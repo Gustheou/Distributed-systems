@@ -1,4 +1,4 @@
-package Elements;
+package Util;
 
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;

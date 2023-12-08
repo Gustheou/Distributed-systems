@@ -1,4 +1,4 @@
-package Elements;
+package Model;
 
 import java.io.Serializable;
 import java.util.Random;

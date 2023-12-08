@@ -9,9 +9,8 @@ import java.util.ResourceBundle;
 
 import javax.sound.sampled.Clip;
 
-import Elements.Musicas;
-import Elements.SistemaDistribuido;
-import Elements.Tiro;
+import Util.Musicas;
+import Util.Tiro;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -46,7 +45,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
 
   private Thread threadParaCriarNaves;
 
-  private SistemaDistribuido sistema;
+  private ControleSistemaDistribuido sistema;
 
   List<Label> inimigosList = new ArrayList<Label>();
 
@@ -86,7 +85,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      sistema = new SistemaDistribuido();
+      sistema = new ControleSistemaDistribuido();
       sistema.criarInimigosAutomaticamente(10, this);
       sistema.criarNavesAutomaticamente(5, this);
       sistema.iniciarJogo();
@@ -271,7 +270,6 @@ public class ControleAlgoritmoConsenso implements Initializable{
     ImageView ship = getNave("Nave"+id);
     Label respostaEleicao = getInfoLabel(ship.getId());
     respostaEleicao.setLayoutX(ship.getLayoutX());
-    //System.out.println("EIXO X:" + ship.getX() + " || " + respostaEleicao.getLayoutX() + " || " + ship.getLayoutX() + " || " + ship.getId());
     respostaEleicao.setLayoutY(450);
     Platform.runLater(() -> {
       if (!blackAnchorPane.getChildren().contains(respostaEleicao)){
@@ -287,7 +285,6 @@ public class ControleAlgoritmoConsenso implements Initializable{
     ImageView ship = getNave("Nave"+id);
     Label respostaEleicao = getInfoLabel(ship.getId());
     respostaEleicao.setLayoutX(ship.getLayoutX());
-    //System.out.println("EIXO X:" + ship.getX() + " || " + respostaEleicao.getLayoutX() + " || " + ship.getLayoutX() + " || " + ship.getId());
     respostaEleicao.setLayoutY(450);
     
     Platform.runLater(() -> {
@@ -348,5 +345,10 @@ public class ControleAlgoritmoConsenso implements Initializable{
       lider.setText("Lider?");
 
     });
+  }
+
+  public void eliminarAlvo(int id) {
+    Label inimigo = inimigosList.get(id);
+    inimigo.setVisible(false);
   }
 }

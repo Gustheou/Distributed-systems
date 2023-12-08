@@ -1,4 +1,4 @@
-package Elements;
+package Model;
 
 import java.io.*;
 import java.net.*;
@@ -8,6 +8,11 @@ import java.util.Random;
 
 
 import Controller.ControleAlgoritmoConsenso;
+import Controller.ControleSistemaDistribuido;
+import Util.AlvoCompartilhado;
+import Util.LiderancaSemaphore;
+import Util.MensagemEleicao;
+import Util.ProcessoEleitoral;
 
 public class Nave extends Thread {
   private double x;
@@ -15,7 +20,7 @@ public class Nave extends Thread {
   private int porta;
   private boolean isLeader;
   private int id;
-  private SistemaDistribuido sistemaDistribuido;
+  private ControleSistemaDistribuido sistemaDistribuido;
   private LiderancaSemaphore liderancaSemaphore = LiderancaSemaphore.getInstance();
   private ProcessoEleitoral processoEleitoral = ProcessoEleitoral.getInstance();
   private int liderAtual;
@@ -26,7 +31,7 @@ public class Nave extends Thread {
 
   private ControleAlgoritmoConsenso controleAlgoritmoConsenso;
 
-  public Nave(int id, SistemaDistribuido sistemaDistribuido, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
+  public Nave(int id, ControleSistemaDistribuido sistemaDistribuido, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
     this.liderAtual = -1;
     this.isLeader = false;
     this.id = id;
@@ -167,6 +172,7 @@ public class Nave extends Thread {
       System.out.println("Nave " + id + " is attacking Pedra " + alvo.getId() + " Nivel de vida: " + alvo.getVida());
       alvo.diminuirVida(1);
     } else {
+      controleAlgoritmoConsenso.eliminarAlvo(id);
       System.out.println("Pedra de ID "+alvo.getId()+" foi eliminada");
     }
   }

@@ -1,17 +1,20 @@
-package Elements;
+package Controller;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import Controller.ControleAlgoritmoConsenso;
+
+import Model.Inimigo;
+import Model.Nave;
+
 import java.util.Random;
 
-public class SistemaDistribuido {
+public class ControleSistemaDistribuido {
   private List<Nave> naves;
   private List<Inimigo> inimigos;
   private boolean jogoEmexecucao = true;
 
-  public SistemaDistribuido() {
+  public ControleSistemaDistribuido() {
     naves = new CopyOnWriteArrayList<>();
     inimigos = new CopyOnWriteArrayList<>();
   }
