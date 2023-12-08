@@ -123,7 +123,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
     multipleAnswer.add(info);
     movimentacao(ship, 2, 621, 443);
     Platform.runLater(() -> {
-      blackAnchorPane.getChildren().add(ship);
+      //blackAnchorPane.getChildren().add(ship);
     });
   }
 
