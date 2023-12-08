@@ -3,9 +3,7 @@ package Elements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import Controller.ControleAlgoritmoConsenso;
-
 import java.util.Random;
 
 public class SistemaDistribuido {
