@@ -42,7 +42,6 @@ public class SistemaDistribuido {
           this.jogoEmexecucao = false;
         }
       }
-
       try {
         Thread.sleep(5000); // Aguarda 5 segundos (ajuste conforme necessário)
       } catch (InterruptedException e) {
