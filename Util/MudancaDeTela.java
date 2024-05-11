@@ -20,6 +20,8 @@ public class MudancaDeTela {
 *************************************************************** */
   public static void init (Stage cenario) throws IOException {
     new ControleTela();
+    new ControleAlgoritmoConsenso();
+    new ControleSistemaDistribuido();
     Parent fxmlTelaInicial = FXMLLoader.load(MudancaDeTela.class.getResource("/View/Fxml/Tela.fxml"));
     telaMenu = new Scene (fxmlTelaInicial);
 

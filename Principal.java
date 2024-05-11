@@ -1,7 +1,7 @@
 /* ***************************************************************
-* Autor............: Gustavo Pereira Nunes
-* Inicio...........: 29/03/2022
-* Ultima alteracao.: 09/04/2022
+* Autor............: Gustavo Pereira Nunes & Weslei Ferreira Santos
+* Inicio...........: 08/05/2024
+* Ultima alteracao.: 
 * Nome.............: Principal
 * Funcao...........: O programa tem como funcao simular entrega de bombas para seus clientes
 *************************************************************** */

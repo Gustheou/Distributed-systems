@@ -18,7 +18,7 @@ public class Nave extends Thread {
   private double x;
   private double y;
   private int porta;
-  private boolean isLeader;
+  private boolean isLeader = false;
   private int id;
   private ControleSistemaDistribuido sistemaDistribuido;
   private LiderancaSemaphore liderancaSemaphore = LiderancaSemaphore.getInstance();
@@ -32,14 +32,10 @@ public class Nave extends Thread {
   private ControleAlgoritmoConsenso controleAlgoritmoConsenso;
 
   public Nave(int id, ControleSistemaDistribuido sistemaDistribuido, ControleAlgoritmoConsenso controleAlgoritmoConsenso) {
-    this.liderAtual = -1;
-    this.isLeader = false;
     this.id = id;
-    this.porta = id +49152;
+    this.porta = id + 49152;
     this.sistemaDistribuido = sistemaDistribuido;
     this.alvoAtual = null;
-    this.alvoCompartilhado=AlvoCompartilhado.getInstance();
-    this.alvoCompartilhado.setControleAlgoritmoConsenso(controleAlgoritmoConsenso);
     this.controleAlgoritmoConsenso = controleAlgoritmoConsenso;
     try {
       serverSocket = new ServerSocket(porta);
@@ -55,7 +51,6 @@ public class Nave extends Thread {
       while (true) {
         Socket socket = serverSocket.accept();
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-
         while (true) {
           try {
             Object mensagem = in.readObject();
@@ -71,7 +66,7 @@ public class Nave extends Thread {
               // Leia o alvo atual do banco de dados compartilhado
               Inimigo alvo = alvoCompartilhado.getAlvoAtual();
               if (alvo != null) {
-                atacar(alvo);
+                //atacar(alvo); -----------------------------------------------
               }else{
                 System.out.println("Alvo em questão esta nulo");
               }
@@ -122,17 +117,18 @@ public class Nave extends Thread {
         e.printStackTrace();
       }
       int maioria = (outrasNavesList.size()/2)+1;
-      if(processoEleitoral.getNumeroDeRespotasPositivas()>=maioria){
+      if(processoEleitoral.getNumeroDeRespotas()>=maioria){
         processoEleitoral.setIsLeader(true);
         System.out.println("Nave " + id + " é o líder!");
         //controleAlgoritmoConsenso;
         String idNave = "Nave"+id;
         controleAlgoritmoConsenso.setLeader(idNave);
         System.out.println("nave id: " + idNave);
+        AlvoCompartilhado.setAlvoAtual(alvo);
 
-        alvoCompartilhado.setAlvoAtual(alvo);
+        //controleAlgoritmoConsenso.eliminarAlvo(alvo.getId());
         try{
-          System.out.println("Nave de ID "+ id +" escolheu pedra de ID "+ alvo.getId());
+          System.out.println("Nave de ID "+ id +" escolheu o inimigo de ID "+ alvo.getId());
         }catch(NullPointerException e){
           System.out.println("Nave nula ou não encontrada");
         }
@@ -142,16 +138,15 @@ public class Nave extends Thread {
           if (outraNave.getId() != id) {
             // Envie uma mensagem de eleição para todas as outras naves
             // Leia o alvo atual do banco de dados compartilhado
-
-            enviarComandoDeAtaque(alvoCompartilhado.getAlvoAtual());
+            enviarComandoDeAtaque(AlvoCompartilhado.getAlvoAtual());
+            //sistemaDistribuido.removerAlvo(alvo);
           }
         }
-        processoEleitoral.zeraNumeroDeRespostasPositivas();
+        processoEleitoral.zerarNumeroDeRespostas();
       }else{
         System.out.println("Nave " + id + " não é o líder.");
       }
       aguardandoRespostas = false;
-
     }
   }
 
@@ -159,23 +154,16 @@ public class Nave extends Thread {
     // Uma nave recebe uma mensagem de eleição e decide se aceita a liderança do
     // proponente
     Random randTom = new Random();
-
-    return randTom.nextInt(2)==1 ? true:false;
+    return randTom.nextInt(2) == 1 ? true:false;
   }
 
-  //UM TIRO SO
+/*
   public void atacar(Inimigo alvo) {
     //rotacionar e atacar
-
-    if (alvo.getVida() >= 1) {
-      System.out.println("Nave " + id + " is attacking Pedra " + alvo.getId() + " Nivel de vida: " + alvo.getVida());
-      alvo.diminuirVida(1);
-    } else {
-      controleAlgoritmoConsenso.eliminarAlvo(id);
-      System.out.println("Pedra de ID "+alvo.getId()+" foi eliminada");
-    }
+    controleAlgoritmoConsenso.eliminarAlvo(id);
+    System.out.println("Pedra de ID "+alvo.getId()+" foi eliminada");
   }
-
+*/
   //PROCESSO MAIS DEMOCRATICO 
   //RANDOMICO 0 E 1
   public void responderEleicao(MensagemEleicao mensagem) {
@@ -187,14 +175,13 @@ public class Nave extends Thread {
     if(chanceDeAceitacao > limiteDeAceitacao){
       // A nave aceitou a liderança do propante 
       processoEleitoral.setLiderAtual(mensagem.getIdOrigem());
-      processoEleitoral.setRespostasPositiva();
+      processoEleitoral.setRespostaPositiva();
       //LABEL PARA APROVAR ELEICAO
-      controleAlgoritmoConsenso.aFavorEleicao(id);
-
+      //controleAlgoritmoConsenso.aFavorEleicao(id);
       liderAtual = mensagem.getIdOrigem();
     }else{
       //LABEL PARA NEGAR A ELEICAO
-      controleAlgoritmoConsenso.contraEleicao(id);
+      //controleAlgoritmoConsenso.contraEleicao(id);
       
       System.out.println("Canditado "+mensagem.getIdOrigem()+" teve sua proposta negada por nave de ID "+id);
     }
@@ -223,8 +210,7 @@ public class Nave extends Thread {
 
   public void enviarComandoDeAtaque(Inimigo alvo) {
     try {
-      Nave[] outrasNaves = sistemaDistribuido.getNaves();
-
+      List<Nave> outrasNaves = sistemaDistribuido.getNavesList();
       for (Nave outraNave : outrasNaves) {
         if (outraNave.getId() != id) {
           // Crie um soquete para se comunicar com a nave de destino
@@ -236,6 +222,13 @@ public class Nave extends Thread {
             int idDoAlvo = alvo.getId();
             out.writeObject(idDoAlvo);
             out.flush();
+            controleAlgoritmoConsenso.eliminarAlvo(alvo.getId());
+            sistemaDistribuido.removerAlvo(alvo);
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
           }
 
           // Feche o soquete
@@ -251,7 +244,7 @@ public class Nave extends Thread {
   public void run() {
     while (true) {
       try {
-        if (sistemaDistribuido.getNaves().length > 1) {
+        if (sistemaDistribuido.getNavesList().size() > 1) {
 
           iniciarEleicao();
 
@@ -262,6 +255,7 @@ public class Nave extends Thread {
       // Se a nave foi eleita líder, execute a ação de ataque
       if (isLeader) {
         //escolherAlvo(Random int);
+        System.out.println("Nave"+this.id+"  Eh lider");
       }
 
       

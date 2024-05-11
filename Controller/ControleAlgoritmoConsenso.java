@@ -9,8 +9,8 @@ import java.util.ResourceBundle;
 
 import javax.sound.sampled.Clip;
 
+import Model.Tiro;
 import Util.Musicas;
-import Util.Tiro;
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -34,20 +34,20 @@ public class ControleAlgoritmoConsenso implements Initializable{
   private AnchorPane blackAnchorPane;
 
   @FXML
-  private ImageView ship;
+  private ImageView nave;
 
   @FXML
   private Label respostaEleicao;
 
   private List<Label> multipleAnswer = new ArrayList<Label>();
 
-  private List<ImageView> multipleShips = new ArrayList<ImageView>();
-
   private Thread threadParaCriarNaves;
 
   private ControleSistemaDistribuido sistema;
 
-  List<Label> inimigosList = new ArrayList<Label>();
+  private List<Label> inimigosList = new ArrayList<Label>();
+
+  private List<ImageView> listaDeNaves = new ArrayList<ImageView>();
 
   private final int POSSIVEIS_INIMIGOS = 23;
   
@@ -69,8 +69,6 @@ public class ControleAlgoritmoConsenso implements Initializable{
     ControleTela.algoritmoRodando.setOnCloseRequest(e -> {
       Platform.runLater(() -> {
         musicas.interromperMusica();
-        //tem que interromper as threads tambem
-        System.out.println("ThreadAlive: " + threadParaCriarNaves.isAlive());
         if (threadParaCriarNaves.isAlive()){
           threadParaCriarNaves.interrupt();
         }
@@ -88,7 +86,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
       sistema = new ControleSistemaDistribuido();
       sistema.criarInimigosAutomaticamente(10, this);
       sistema.criarNavesAutomaticamente(5, this);
-      sistema.iniciarJogo();
+      //sistema.iniciarJogo();
     });
     return threadParaCriarNaves;
   }
@@ -102,7 +100,7 @@ public class ControleAlgoritmoConsenso implements Initializable{
     fadeTransition.play();
   }
 
-  public void novaNave(int newID){
+  public void novaNave(int novoID){
     int index = 0;
     for (int i = 0; i < statusDeOcupacaoDasNaves.length; i++){
       if (statusDeOcupacaoDasNaves[i] == false) {
@@ -111,23 +109,18 @@ public class ControleAlgoritmoConsenso implements Initializable{
         break;
       }
     }
-    ship = new ImageView(new Image("/View/Images/Player.png"));
-    ship.setFitWidth(81);
-    ship.setFitHeight(79);
-    ship.setLayoutX(posicoesDasNaves[index]);
-    ship.setId("Nave"+newID);
-    System.out.println("ID nave: " + ship.getId());
-    multipleShips.add(ship);
-    Label info = new Label();
-    info.setId(ship.getId());
-    multipleAnswer.add(info);
-    movimentacao(ship, 2, 621, 443);
-    Platform.runLater(() -> {
-      //blackAnchorPane.getChildren().add(ship);
-    });
+    nave = new ImageView(new Image("/View/Images/Player.png"));
+    nave.setFitWidth(81);
+    nave.setFitHeight(79);
+    nave.setLayoutX(posicoesDasNaves[index]);
+    nave.setId("Nave"+novoID);
+    System.out.println("ID nave: " + nave.getId());
+    listaDeNaves.add(nave);
+    movimentacao(nave, 2, 621, 443);
+    adicionarNaTela(blackAnchorPane, nave);
   }
 
-  public void novoInimigo(){
+  public void novoInimigo(int id){
     int indiceInimigo = new Random().nextInt(POSSIVEIS_INIMIGOS);
     if (inimigosSelecionaods.contains(indiceInimigo)){
       while(inimigosSelecionaods.contains(indiceInimigo)){
@@ -135,17 +128,15 @@ public class ControleAlgoritmoConsenso implements Initializable{
       }
     }
     inimigosSelecionaods.add(indiceInimigo);
-    Label enemy = new Label(inimigoAleatorio(indiceInimigo));
-    enemy.setFont(Font.loadFont(getClass().getResourceAsStream("/View/Fonts/FOT_Rodin_Pro_DB.otf"), (new Random().nextInt(20))+10));
-    enemy.setLayoutX(new Random().nextInt(700));
-    enemy.setTextFill(Color.WHITE);
-    //MUDAR A COR
+    Label inimigo = new Label(inimigoAleatorio(indiceInimigo));
+    inimigo.setFont(Font.loadFont(getClass().getResourceAsStream("/View/Fonts/FOT_Rodin_Pro_DB.otf"), (new Random().nextInt(20))+10));
+    inimigo.setLayoutX(new Random().nextInt(700));
+    inimigo.setTextFill(Color.WHITE);
+    inimigo.setId(String.valueOf(id));
     int posicaoFinalY = (new Random().nextInt(130))*2;
-    movimentacao(enemy, 4, -65, posicaoFinalY);
-    Platform.runLater(() -> {
-      blackAnchorPane.getChildren().add(enemy);
-    });
-    inimigosList.add(enemy);
+    movimentacao(inimigo, 4, -65, posicaoFinalY);
+    adicionarNaTela(blackAnchorPane, inimigo);
+    inimigosList.add(inimigo);
   }
 
   public Label escolherAlvo(){
@@ -155,14 +146,23 @@ public class ControleAlgoritmoConsenso implements Initializable{
 
   public void rotacionarParaAtacar(int id) {
     Label alvo = inimigosList.get(id);
-    double posicaoXDaNave = ship.getLayoutX();
-    double posicaoYDaNave = ship.getLayoutY();
+    for (Label target:inimigosList) {
+      if (target.getId().equals(String.valueOf(id))) {
+        alvo = target;
+        break;
+      }
+    }
+    double posicaoXDaNave = nave.getLayoutX();
+    double posicaoYDaNave = nave.getLayoutY();
     double posicaoXDoAlvo = alvo.getLayoutX();
     double posicaoYDoAlvo = alvo.getLayoutY();
-    System.out.println(ship.getRotate());
+    System.out.println("X da nave: " + posicaoXDaNave);
+    System.out.println("Y da nave: " + posicaoYDaNave);
+    System.out.println("X do alvo: " + posicaoXDoAlvo);
+    System.out.println("Y do alvo: " + posicaoYDoAlvo);
+    System.out.println(nave.getRotate());
     Platform.runLater(() -> {
-
-      ship.setRotate(calcularAngulacaoDoSeno(posicaoXDaNave, posicaoYDaNave, posicaoXDoAlvo, posicaoYDoAlvo));
+      nave.setRotate(calcularAngulacaoDoSeno(posicaoXDaNave, posicaoYDaNave, posicaoXDoAlvo, posicaoYDoAlvo));
     });
   }
 
@@ -173,14 +173,29 @@ public class ControleAlgoritmoConsenso implements Initializable{
     return catetoAdjacente/hipotenusa;
   }
 
-  private void atirar(){
-    Tiro tiro = new Tiro(ship);
-    alvoAtual = escolherAlvo();
+  private void atirar(int id){
+    Tiro tiro = new Tiro(nave, this);
+    alvoAtual = inimigosList.get(id);
+    for (Label target:inimigosList) {
+      if (target.getId().equals(String.valueOf(id))) {
+        alvoAtual = target;
+        break;
+      }
+    }
     tiro.atirar(alvoAtual);
   }
 
   private void movimentacao(Node objeto, int duracaoEmSegundos, int posicaoInicialY, int posicaoFinalY){
     TranslateTransition animacao = new TranslateTransition(Duration.seconds(duracaoEmSegundos), objeto);
+    animacao.setFromY(posicaoInicialY);
+    animacao.setToY(posicaoFinalY);
+    animacao.play();
+  }
+
+  public void movimentacao(Node objeto, double duracaoEmSegundos, double posicaoInicialX, double posicaoFinalX, double posicaoInicialY, double posicaoFinalY){
+    TranslateTransition animacao = new TranslateTransition(Duration.seconds(duracaoEmSegundos), objeto);
+    animacao.setFromX(posicaoInicialX);
+    animacao.setToX(posicaoFinalX);
     animacao.setFromY(posicaoInicialY);
     animacao.setToY(posicaoFinalY);
     animacao.play();
@@ -266,10 +281,11 @@ public class ControleAlgoritmoConsenso implements Initializable{
     }
   }
 
+/*
   public void aFavorEleicao(int id){
-    ImageView ship = getNave("Nave"+id);
-    Label respostaEleicao = getInfoLabel(ship.getId());
-    respostaEleicao.setLayoutX(ship.getLayoutX());
+    ImageView nave = getNave("Nave"+id);
+    Label respostaEleicao = getInfoLabel(nave.getId());
+    respostaEleicao.setLayoutX(nave.getLayoutX());
     respostaEleicao.setLayoutY(450);
     Platform.runLater(() -> {
       if (!blackAnchorPane.getChildren().contains(respostaEleicao)){
@@ -281,10 +297,11 @@ public class ControleAlgoritmoConsenso implements Initializable{
     });
   }
 
+
   public void contraEleicao(int id){
-    ImageView ship = getNave("Nave"+id);
-    Label respostaEleicao = getInfoLabel(ship.getId());
-    respostaEleicao.setLayoutX(ship.getLayoutX());
+    ImageView nave = getNave("Nave"+id);
+    Label respostaEleicao = getInfoLabel(nave.getId());
+    respostaEleicao.setLayoutX(nave.getLayoutX());
     respostaEleicao.setLayoutY(450);
     
     Platform.runLater(() -> {
@@ -296,46 +313,30 @@ public class ControleAlgoritmoConsenso implements Initializable{
       respostaEleicao.setVisible(true);
     });
   }
+*/
 
   private ImageView getNave(String id){
-    ImageView naveEscolhida = new ImageView();
-    for(ImageView nave : multipleShips){
+    for(ImageView nave : listaDeNaves){
       if (nave.getId().equals(id)){
-        naveEscolhida = nave;
-        break;
+        return nave;
       }
     }
-    return naveEscolhida;
-  }
+    return null;
+}
 
   private Label getInfoLabel(String id){
     Label labelEscolhido = new Label();
-    for(Label nave : multipleAnswer){
-      if (nave.getId().equals(id)){
-        labelEscolhido = nave;
-        break;
-      }
-    }
+    labelEscolhido.setLayoutX(getNave(id).getLayoutX());
+    labelEscolhido.setLayoutY(getNave(id).getLayoutY()+20);
     labelEscolhido.setFont(Font.loadFont(getClass().getResourceAsStream("/View/Fonts/FOT_Rodin_Pro_DB.otf"), 12));
     labelEscolhido.setTextFill(Color.WHITE);
     return labelEscolhido;
   }
   
-  public int getNumeroDeNave(){
-    int contador = 0;
-    for (int i = 0; i < statusDeOcupacaoDasNaves.length; i++){
-      if (statusDeOcupacaoDasNaves[i] == true) {
-        contador = contador + 1;
-      }
-    }
-    return contador;
-  }
-
   public void setLeader(String id){
     Label lider = getInfoLabel(id);
     Platform.runLater(() -> {
       lider.setText("Lider");
-
     });
   }
 
@@ -343,12 +344,36 @@ public class ControleAlgoritmoConsenso implements Initializable{
     Label lider = getInfoLabel(id);
     Platform.runLater(() -> {
       lider.setText("Lider?");
-
     });
   }
 
   public void eliminarAlvo(int id) {
-    Label inimigo = inimigosList.get(id);
-    inimigo.setVisible(false);
+    int idDaLista = idDoAlvoNaLista(id);
+    System.out.println ("ID DO ALVO: " + idDaLista + "Nome do alvo: " + inimigosList.get(idDaLista).getText());
+    rotacionarParaAtacar(idDaLista);
+    atirar(idDaLista);
+    Platform.runLater(() -> {
+      blackAnchorPane.getChildren().remove(inimigosList.get(idDaLista));
+    });
+    inimigosList.remove(idDaLista);
+  }
+
+  private void adicionarNaTela(AnchorPane anchorPane, Node objeto) {
+    Platform.runLater(() -> {
+      anchorPane.getChildren().add(objeto);
+    });
+  }
+
+  public List<Label> getAlvos(){
+    return inimigosList;
+  }
+
+  private int idDoAlvoNaLista(int id) {
+    for(int i = 0; i < inimigosList.size(); i++){
+      if (inimigosList.get(i).getId().equals(String.valueOf(id))){
+        return i;
+      }
+    }
+    return 0;
   }
 }
